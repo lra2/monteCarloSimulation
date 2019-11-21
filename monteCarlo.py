@@ -6,38 +6,43 @@ from variable import Variable
 import variableHelper
 import calculationHelper
 
+numberOfSamples = 10000
+
 porosity = Variable()
 porosity.setVariableName("Porosity")
 variableHelper.setParametersBasedOnDistributionType(porosity)
 porosityProbability = calculationHelper.getProbabilityBasedOnDistributionType(porosity)
-#print(porosityProbability)
 
 area = Variable()
 area.setVariableName("Area")
 variableHelper.setParametersBasedOnDistributionType(area)
 areaProbability = calculationHelper.getProbabilityBasedOnDistributionType(area)
-#print(areaProbability)
 
 payZone = Variable()
 payZone.setVariableName("Pay Zone")
 variableHelper.setParametersBasedOnDistributionType(payZone)
 payZoneProbability = calculationHelper.getProbabilityBasedOnDistributionType(payZone)
-#print(payZoneProbability)
 
-saturation = Variable()
-saturation.setVariableName("Water Saturation")
-variableHelper.setParametersBasedOnDistributionType(saturation)
-saturationProbability = calculationHelper.getProbabilityBasedOnDistributionType(saturation)
-#print(saturationProbability)
+waterSaturation = Variable()
+waterSaturation.setVariableName("Water Saturation")
+variableHelper.setParametersBasedOnDistributionType(waterSaturation)
+waterSaturationProbability = calculationHelper.getProbabilityBasedOnDistributionType(waterSaturation)
 
-bo = Variable()
-bo.setVariableName("B0")
-variableHelper.setParametersBasedOnDistributionType(bo)
-boProbability = calculationHelper.getProbabilityBasedOnDistributionType(bo)
-#print(boProbability)
+formationVolumeFactor = Variable()
+formationVolumeFactor.setVariableName("Formation Volume Factor")
+variableHelper.setParametersBasedOnDistributionType(formationVolumeFactor)
+formationVolumeFactorProbability = calculationHelper.getProbabilityBasedOnDistributionType(formationVolumeFactor)
 
-factor = Variable()
-factor.setVariableName("Factor Rec.")
-variableHelper.setParametersBasedOnDistributionType(factor)
-factorProbability = calculationHelper.getProbabilityBasedOnDistributionType(factor)
-#print(factorProbability)
+recoveryFactor = Variable()
+recoveryFactor.setVariableName("Recovery Factor")
+variableHelper.setParametersBasedOnDistributionType(recoveryFactor)
+recoveryFactorProbability = calculationHelper.getProbabilityBasedOnDistributionType(recoveryFactor)
+
+npValues = []
+for i in range(numberOfSamples):
+    #create and calculate variables
+    #Check chosen unit system, and if necessary perform value conversion
+    npValue = calculationHelper.calculateReserve("SI", area=areaProbability, payZone=payZoneProbability, porosity=porosityProbability, waterSaturation=waterSaturationProbability, recoveryFactor=recoveryFactorProbability, formationVolume=formationVolumeFactorProbability)
+    npValues.append(npValue)
+
+npValuesAverage = np.mean(npValues)
