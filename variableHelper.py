@@ -20,7 +20,7 @@ def setParametersBasedOnDistributionType(variable = Variable):
             setParametersBasedOnDistributionType(variable)
             return variable.setTriangularParameters(parameters)
 
-    elif variable.getVariableDistributionType() == "Simple":
+    elif variable.getVariableDistributionType() == "Single":
         return variable.setFixedParameters(parameters)
             
     else:

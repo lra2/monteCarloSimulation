@@ -37,11 +37,11 @@ class Variable(Parameters):
         _minimumValue = float(input("Enter minimum value for " + self.getVariableName() + ": "))
         parameters.setMinimum(_minimumValue)
 
-        _maximumValue = float(input("Enter maximum value for " + self.getVariableName() + ": "))
-        parameters.setMinimum(_maximumValue)
-
         _mostLikelyValue = float(input("Enter most likely value for " + self.getVariableName() + ": "))
         parameters.setMostLikely(_mostLikelyValue)
+
+        _maximumValue = float(input("Enter maximum value for " + self.getVariableName() + ": "))
+        parameters.setMaximum(_maximumValue)
 
         self.setVariableParameters(parameters)
     
