@@ -1,8 +1,10 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import random
 import statistics
 from tkinter import *
+from tkinter import filedialog
 from parameters import Parameters
 from variable import Variable
 import variableHelper
@@ -14,15 +16,27 @@ class Simulation:
     def __init__(self, master=None):
         master.title('Monte Carlo Simulation')
 
-        self.DefaultFont = ("Arial", "10")
+        self.DefaultFont = ("Calibri", "10")
+
+        self.areaValues = []
+        self.thicknessValues = []
+        self.porosityValues = []
+        self.waterSaturationValues = []
+        self.recoveryFactorValues = []
+        self.formationVolumeFactorValues = []
+        self.npValues = []
 
         self.parametersDataContainer = Frame(master)
         self.parametersDataContainer["pady"] = 10
         self.parametersDataContainer.pack()
 
         self.parametersTitle = Label(self.parametersDataContainer, text="Enter parameters for simulation")
-        self.parametersTitle["font"] = ("Arial", "10", "bold")
-        self.parametersTitle.pack()
+        self.parametersTitle["font"] = ("Calibri", "14", "bold")
+        self.parametersTitle.pack(side=TOP)
+
+        self.parametersHint = Label(self.parametersDataContainer, text="Parameters order: Min, Likely, Max")
+        self.parametersHint["font"] = ("Calibri", "10")
+        self.parametersHint.pack(side=BOTTOM)
 
         #Containers
         self.areaContainer = Frame(master)
@@ -356,23 +370,51 @@ class Simulation:
         self.buttonContainer["pady"] = 20
         self.buttonContainer.pack()
 
+        self.exportResultsButton = Button(self.buttonContainer)
+        self.exportResultsButton["text"] = "Export Data"
+        self.exportResultsButton["font"] = ("Calibri", "12")
+        self.exportResultsButton["width"] = 15
+        self.exportResultsButton["command"] = self.exportData
+        self.exportResultsButton.config(state=DISABLED)
+        self.exportResultsButton.pack(side=RIGHT)
+
+        self.showHistogramButton = Button(self.buttonContainer)
+        self.showHistogramButton["text"] = "Show Histogram"
+        self.showHistogramButton["font"] = ("Calibri", "12")
+        self.showHistogramButton["width"] = 15
+        self.showHistogramButton["command"] = self.showHistogram
+        self.showHistogramButton.config(state=DISABLED)
+        self.showHistogramButton.pack(side=RIGHT)
+
         self.calculateButton = Button(self.buttonContainer)
         self.calculateButton["text"] = "Calculate"
-        self.calculateButton["font"] = ("Calibri", "8")
+        self.calculateButton["font"] = ("Calibri", "12", "bold")
         self.calculateButton["width"] = 12
+        self.calculateButton["padx"] = 15
         self.calculateButton["command"] = self.calculate
-        self.calculateButton.pack()
+        self.calculateButton.pack(side=LEFT)
 
-        self.result = Label(self.buttonContainer, text="", font=self.DefaultFont)
+        self.resultContainer = Frame(master)
+        self.resultContainer["pady"] = 15
+        self.resultContainer.pack()
+
+        self.result = Label(self.resultContainer, text="", font=("Calibri", "12", "bold"))
         self.result.pack()
 
     def calculate(self):
         #Unity System Choice
         _unitySystemChoice = unitySystemChoice.get()
         self.setAllParameters()
-        npResults = runSimulation(_unitySystemChoice, area, thickness, porosity, waterSaturation, recoveryFactor, formationVolumeFactor)
-        npAverage = np.mean(npResults, dtype=np.float64)
-        self.result["text"] = "Ev = " + str(npAverage)
+        self.npResults = runSimulation(_unitySystemChoice, area, thickness, porosity, waterSaturation, recoveryFactor, formationVolumeFactor, self)
+        self.npAverage = round(np.mean(self.npResults, dtype=np.float64), 2)
+
+        if self.npAverage == 0:
+            self.showHistogramButton.config(state=DISABLED)
+            self.exportResultsButton.config(state=DISABLED)
+        else:
+            self.showHistogramButton.config(state=NORMAL)
+            self.exportResultsButton.config(state=NORMAL)
+        self.result["text"] = "Ev = " + str(self.npAverage)
 
     def handleAreaDistributionChoice(self):
         choice = areaDistributionTypeChoice.get()
@@ -512,8 +554,38 @@ class Simulation:
         volumeMostLikelyValue = getEntryValue(self.singleFormationVolumeFactorEntry)
         volumeMaxValue = getEntryValue(self.maxFormationVolumeFactorEntry)
         variableHelper.setParametersBasedOnDistributionType(formationVolumeFactor, distributionType=volumeDistChoice, minValue=volumeMinValue, mostLikelyValue=volumeMostLikelyValue, maxValue=volumeMaxValue)
+    
+    def showHistogram(self):
+        standardDeviation = statistics.pstdev(self.npResults, mu=None)
+        num_bins = NUMBER_OF_SAMPLES
 
-def runSimulation(unitySystem, area, thickness, porosity, waterSaturation, recoveryFactor, formationVolumeFactor):
+        fig, ax = plt.subplots()
+
+        n, bins, patches = ax.hist(self.npResults, num_bins, density=1)
+        
+        y = ((1 / (np.sqrt(2 * np.pi) * standardDeviation)) *
+            np.exp(-0.5 * (1 / standardDeviation * (bins - self.npAverage))**2))
+
+        ax.plot(bins, y, '--')
+        ax.set_xlabel('Np')
+        ax.set_ylabel('Y')
+
+        fig.tight_layout()
+        plt.show()
+    
+    def exportData(self):
+        tableDictionary = {'Area': self.areaValues,
+                        'Thickness': self.thicknessValues,
+                        'Porosity': self.porosityValues,
+                        'Water Saturation': self.waterSaturationValues,
+                        'Recovery Factor': self.recoveryFactorValues,
+                        'Formation Volume Factor': self.formationVolumeFactorValues,
+                        'Np Value': self.npValues}
+        dataFrame = pd.DataFrame(tableDictionary)
+        export_file_path = filedialog.asksaveasfilename(initialdir='~/Documents', defaultextension='.csv')
+        dataFrame.to_csv(export_file_path, index=None, header=True)
+
+def runSimulation(unitySystem, area, thickness, porosity, waterSaturation, recoveryFactor, formationVolumeFactor, simulation):
     npValues = []
     for i in range(NUMBER_OF_SAMPLES):
         areaProbability = 0.0
@@ -524,11 +596,17 @@ def runSimulation(unitySystem, area, thickness, porosity, waterSaturation, recov
         formationVolumeFactorProbability = 0.0
 
         areaProbability = calculationHelper.getProbabilityBasedOnDistributionType(area)
+        simulation.areaValues.append(round(areaProbability, 2))
         thicknessProbability = calculationHelper.getProbabilityBasedOnDistributionType(thickness)
+        simulation.thicknessValues.append(round(thicknessProbability, 2))
         porosityProbability = calculationHelper.getProbabilityBasedOnDistributionType(porosity)
+        simulation.porosityValues.append(round(porosityProbability, 2))
         waterSaturationProbability = calculationHelper.getProbabilityBasedOnDistributionType(waterSaturation)
+        simulation.waterSaturationValues.append(round(waterSaturationProbability, 2))
         recoveryFactorProbability = calculationHelper.getProbabilityBasedOnDistributionType(recoveryFactor)
+        simulation.recoveryFactorValues.append(round(recoveryFactorProbability, 2))
         formationVolumeFactorProbability = calculationHelper.getProbabilityBasedOnDistributionType(formationVolumeFactor)
+        simulation.formationVolumeFactorValues.append(round(formationVolumeFactorProbability, 2))
 
         npValue = calculationHelper.calculateReserve(unitSystem=unitySystem, 
                                     area=areaProbability,
@@ -537,6 +615,7 @@ def runSimulation(unitySystem, area, thickness, porosity, waterSaturation, recov
                                     waterSaturation=waterSaturationProbability,
                                     recoveryFactor=recoveryFactorProbability,
                                     formationVolume=formationVolumeFactorProbability)
+        simulation.npValues.append(round(npValue, 2))
         npValues.append(npValue)
     return npValues
 
@@ -589,20 +668,3 @@ variableHelper.setParametersBasedOnDistributionType(formationVolumeFactor)
 
 Simulation(root)
 root.mainloop()
-
-# standardDeviation = statistics.pstdev(npValues, mu=None)
-# num_bins = NUMBER_OF_SAMPLES
-
-# fig, ax = plt.subplots()
-
-# n, bins, patches = ax.hist(npValues, num_bins, density=1)
-
-# y = ((1 / (np.sqrt(2 * np.pi) * standardDeviation)) *
-#      np.exp(-0.5 * (1 / standardDeviation * (bins - npValuesAverage))**2))
-
-# ax.plot(bins, y, '--')
-# ax.set_xlabel('Np')
-# ax.set_ylabel('Y')
-
-# fig.tight_layout()
-# plt.show()

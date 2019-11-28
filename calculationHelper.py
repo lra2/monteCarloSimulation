@@ -34,5 +34,6 @@ def calculateReserve(unitSystem = "", area = 0.0, thickness = 0.0, porosity = 0.
     if unitSystem == "USCS":
         numerator *= reserveConst
     
-    recoverableOil = (numerator/denominator)*recoveryFactor
+    if denominator != 0:
+        recoverableOil = (numerator/denominator)*recoveryFactor
     return recoverableOil
