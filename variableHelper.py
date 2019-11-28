@@ -1,31 +1,19 @@
 from parameters import Parameters
 from variable import Variable
 
-def setParametersBasedOnDistributionType(variable = Variable):
-    _distributionType = input("Enter distribution type for " + variable.getVariableName() + ":")
+def setParametersBasedOnDistributionType(variable = Variable, distributionType="", minValue=0.0, mostLikelyValue=0.0, maxValue=0.0):
+    _distributionType = distributionType
 
     variable.setVariableDistributionType(_distributionType)
     parameters = Parameters()
     if variable.getVariableDistributionType() == "Uniform":
-        return variable.setUniformParameters(parameters)
-
-        if isUniformParametersIncorrect(variable):
-            setParametersBasedOnDistributionType(variable)
-            return variable.setUniformParameters(parameters)
+        return variable.setUniformParameters(parameters, minValue, maxValue)
 
     elif variable.getVariableDistributionType() == "Triangular":
-        return variable.setTriangularParameters(parameters)
+        return variable.setTriangularParameters(parameters, minValue, mostLikelyValue, maxValue)
 
-        if isTriangularParametersIncorrect(variable):
-            setParametersBasedOnDistributionType(variable)
-            return variable.setTriangularParameters(parameters)
-
-    elif variable.getVariableDistributionType() == "Single":
-        return variable.setFixedParameters(parameters)
-            
-    else:
-        print("Invalid Distribution Type. Please try again!")
-        setParametersBasedOnDistributionType(variable)
+    elif variable.getVariableDistributionType() == "Simple":
+        return variable.setFixedParameters(parameters, mostLikelyValue)
     
 def isUniformParametersIncorrect(variable):
     if variable.getVariableParameters().Minimum > variable.getVariableParameters().Maximum:

@@ -24,29 +24,17 @@ class Variable(Parameters):
     def getVariableParameters(self):
         return self.Parameters
     
-    def setUniformParameters(self, parameters):
-        _minimumValue = float(input("Enter minimum value for " + self.getVariableName() + ": "))
-        parameters.setMinimum(_minimumValue)
-
-        _maximumValue = float(input("Enter maximum value for " + self.getVariableName() + ": "))
-        parameters.setMaximum(_maximumValue)
-
+    def setUniformParameters(self, parameters, minimumValue=0.0, maximumValue=0.0):
+        parameters.setMinimum(minimumValue)
+        parameters.setMaximum(maximumValue)
         self.setVariableParameters(parameters)
     
-    def setTriangularParameters(self, parameters):
-        _minimumValue = float(input("Enter minimum value for " + self.getVariableName() + ": "))
-        parameters.setMinimum(_minimumValue)
-
-        _mostLikelyValue = float(input("Enter most likely value for " + self.getVariableName() + ": "))
-        parameters.setMostLikely(_mostLikelyValue)
-
-        _maximumValue = float(input("Enter maximum value for " + self.getVariableName() + ": "))
-        parameters.setMaximum(_maximumValue)
-
+    def setTriangularParameters(self, parameters, minimumValue=0.0, mostLikelyValue=0.0, maximumValue=0.0):
+        parameters.setMinimum(minimumValue)
+        parameters.setMostLikely(mostLikelyValue)
+        parameters.setMaximum(maximumValue)
         self.setVariableParameters(parameters)
     
-    def setFixedParameters(self, parameters):
-        _fixedValue = float(input("Enter value for " + self.getVariableName() + ": "))
-        parameters.setFixedValue(_fixedValue)
-
+    def setFixedParameters(self, parameters, mostLikelyValue=0.0):
+        parameters.setFixedValue(mostLikelyValue)
         self.setVariableParameters(parameters)
