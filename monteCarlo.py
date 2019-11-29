@@ -20,7 +20,8 @@ class Simulation:
 
         self.menuBar = Menu(master)
         self.helpMenu = Menu(self.menuBar, tearoff=0)
-        self.helpMenu.add_command(label='Developed by Lucas Rodrigues (lra1001@icloud.com)')
+        self.helpMenu.add_command(label='Developed by João Filipe de Holanda, Petroleum Engineer')
+        self.helpMenu.add_command(label='Developed by Lucas Rodrigues, Computer Engineer')
         self.menuBar.add_cascade(label='About', menu=self.helpMenu)
 
         master.config(menu=self.menuBar)
@@ -648,11 +649,6 @@ def getEntryValue(entry=Entry):
         return float(entry.get())
     else:
         return 0.0
-
-def openNewWindow():
-        test = Toplevel(root)
-        button = Button(test, text="Testing menu button")
-        button.pack()
 
 root = Tk()
 
