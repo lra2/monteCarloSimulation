@@ -14,9 +14,16 @@ NUMBER_OF_SAMPLES = 10000
 
 class Simulation:
     def __init__(self, master=None):
-        master.title('Monte Carlo Simulation')
+        master.title('Reservoir MCS 1.0')
 
         self.DefaultFont = ("Calibri", "10")
+
+        self.menuBar = Menu(master)
+        self.helpMenu = Menu(self.menuBar, tearoff=0)
+        self.helpMenu.add_command(label='Developed by Lucas Rodrigues (lra1001@icloud.com)')
+        self.menuBar.add_cascade(label='About', menu=self.helpMenu)
+
+        master.config(menu=self.menuBar)
 
         self.areaValues = []
         self.thicknessValues = []
@@ -34,7 +41,7 @@ class Simulation:
         self.parametersTitle["font"] = ("Calibri", "14", "bold")
         self.parametersTitle.pack(side=TOP)
 
-        self.parametersHint = Label(self.parametersDataContainer, text="Parameters order: Min, Likely, Max")
+        self.parametersHint = Label(self.parametersDataContainer, text="Parameters order: Minimum, Most Likely, Maximum")
         self.parametersHint["font"] = ("Calibri", "10")
         self.parametersHint.pack(side=BOTTOM)
 
@@ -93,7 +100,7 @@ class Simulation:
         self.formationVolumeLabel = Label(self.formationVolumeFactorContainer, text="Formation Volume Factor", font=self.DefaultFont)
         self.formationVolumeLabel.pack(side=LEFT)
 
-        self.unitySystemLabel = Label(self.unitySystemContainer, text="Choose the unity system", font=self.DefaultFont)
+        self.unitySystemLabel = Label(self.unitySystemContainer, text="Select measurement system:", font=self.DefaultFont)
         self.unitySystemLabel.pack(side=LEFT)
 
         #Area fields
@@ -132,7 +139,7 @@ class Simulation:
         self.areaUniformDistributionCheckbox.pack(side=RIGHT)
 
         self.areaSingleDistributionCheckbox = Radiobutton(self.areaContainer)
-        self.areaSingleDistributionCheckbox["text"] = "Single Dist."
+        self.areaSingleDistributionCheckbox["text"] = "Single Value"
         self.areaSingleDistributionCheckbox["value"] = 'Simple'
         self.areaSingleDistributionCheckbox["variable"] = areaDistributionTypeChoice
         self.areaSingleDistributionCheckbox["command"] = self.handleAreaDistributionChoice
@@ -175,7 +182,7 @@ class Simulation:
         self.thicknessUniformDistributionCheckbox.pack(side=RIGHT)
 
         self.thicknessSingleDistributionCheckbox = Radiobutton(self.thicknessContainer)
-        self.thicknessSingleDistributionCheckbox["text"] = "Single Dist."
+        self.thicknessSingleDistributionCheckbox["text"] = "Single Value"
         self.thicknessSingleDistributionCheckbox["value"] = 'Simple'
         self.thicknessSingleDistributionCheckbox["variable"] = thicknessDistributionChoice
         self.thicknessSingleDistributionCheckbox["command"] = self.handleThicknessDistributionChoice
@@ -218,7 +225,7 @@ class Simulation:
         self.porosityUniformDistributionCheckbox.pack(side=RIGHT)
 
         self.porositySingleDistributionCheckbox = Radiobutton(self.porosityContainer)
-        self.porositySingleDistributionCheckbox["text"] = "Single Dist."
+        self.porositySingleDistributionCheckbox["text"] = "Single Value"
         self.porositySingleDistributionCheckbox["value"] = 'Simple'
         self.porositySingleDistributionCheckbox["variable"] = porosityDistributionChoice
         self.porositySingleDistributionCheckbox["command"] = self.handlePorosityDistributionChoice
@@ -261,7 +268,7 @@ class Simulation:
         self.waterSaturationUniformDistributionCheckbox.pack(side=RIGHT)
 
         self.waterSaturationSingleDistributionCheckbox = Radiobutton(self.waterSaturationContainer)
-        self.waterSaturationSingleDistributionCheckbox["text"] = "Single Dist."
+        self.waterSaturationSingleDistributionCheckbox["text"] = "Single Value"
         self.waterSaturationSingleDistributionCheckbox["value"] = 'Simple'
         self.waterSaturationSingleDistributionCheckbox["variable"] = waterSaturationDistributionChoice
         self.waterSaturationSingleDistributionCheckbox["command"] = self.handleWaterSaturationDistributionChoice
@@ -304,7 +311,7 @@ class Simulation:
         self.recoveryFactorUniformDistributionCheckbox.pack(side=RIGHT)
 
         self.recoveryFactorSingleDistributionCheckbox = Radiobutton(self.recoveryFactorContainer)
-        self.recoveryFactorSingleDistributionCheckbox["text"] = "Single Dist."
+        self.recoveryFactorSingleDistributionCheckbox["text"] = "Single Value"
         self.recoveryFactorSingleDistributionCheckbox["value"] = 'Simple'
         self.recoveryFactorSingleDistributionCheckbox["variable"] = recoveryFactorDistributionChoice
         self.recoveryFactorSingleDistributionCheckbox["command"] = self.handleRecoveryFactorDistributionChoice
@@ -347,7 +354,7 @@ class Simulation:
         self.formationVolumeFactorUniformDistributionCheckbox.pack(side=RIGHT)
 
         self.formationVolumeFactorSingleDistributionCheckbox = Radiobutton(self.formationVolumeFactorContainer)
-        self.formationVolumeFactorSingleDistributionCheckbox["text"] = "Single Dist."
+        self.formationVolumeFactorSingleDistributionCheckbox["text"] = "Single Value"
         self.formationVolumeFactorSingleDistributionCheckbox["value"] = 'Simple'
         self.formationVolumeFactorSingleDistributionCheckbox["variable"] = formationVolumeFactorDistributionChoice
         self.formationVolumeFactorSingleDistributionCheckbox["command"] = self.handleFormationVolumeFactorDistributionChoice
@@ -355,13 +362,13 @@ class Simulation:
 
         #Unity System Field
         self.unitySystemUSCSCheckbox = Radiobutton(self.unitySystemContainer)
-        self.unitySystemUSCSCheckbox["text"] = "USCS"
+        self.unitySystemUSCSCheckbox["text"] = "American"
         self.unitySystemUSCSCheckbox["value"] = 'USCS'
         self.unitySystemUSCSCheckbox["variable"] = unitySystemChoice
         self.unitySystemUSCSCheckbox.pack(side=RIGHT)
 
         self.unitySystemSICheckbox = Radiobutton(self.unitySystemContainer)
-        self.unitySystemSICheckbox["text"] = "SI"
+        self.unitySystemSICheckbox["text"] = "Petrobras"
         self.unitySystemSICheckbox["value"] = 'SI'
         self.unitySystemSICheckbox["variable"] = unitySystemChoice
         self.unitySystemSICheckbox.pack(side=RIGHT)
@@ -382,7 +389,7 @@ class Simulation:
         self.showHistogramButton["text"] = "Show Histogram"
         self.showHistogramButton["font"] = ("Calibri", "12")
         self.showHistogramButton["width"] = 15
-        self.showHistogramButton["command"] = self.showHistogram
+        self.showHistogramButton["command"] = self.showHistogramV2
         self.showHistogramButton.config(state=DISABLED)
         self.showHistogramButton.pack(side=RIGHT)
 
@@ -398,7 +405,7 @@ class Simulation:
         self.resultContainer["pady"] = 15
         self.resultContainer.pack()
 
-        self.result = Label(self.resultContainer, text="", font=("Calibri", "12", "bold"))
+        self.result = Label(self.resultContainer, text="", font=("Calibri", "18", "bold"))
         self.result.pack()
 
     def calculate(self):
@@ -408,13 +415,18 @@ class Simulation:
         self.npResults = runSimulation(_unitySystemChoice, area, thickness, porosity, waterSaturation, recoveryFactor, formationVolumeFactor, self)
         self.npAverage = round(np.mean(self.npResults, dtype=np.float64), 2)
 
+        if _unitySystemChoice == "SI":
+            measurementUnity = "m\u00b3std"
+        elif _unitySystemChoice == "USCS":
+            measurementUnity = "STB"
+
         if self.npAverage == 0:
             self.showHistogramButton.config(state=DISABLED)
             self.exportResultsButton.config(state=DISABLED)
         else:
             self.showHistogramButton.config(state=NORMAL)
             self.exportResultsButton.config(state=NORMAL)
-        self.result["text"] = "Ev = " + str(self.npAverage)
+        self.result["text"] = "Ev = " + str(self.npAverage) + " " + measurementUnity
 
     def handleAreaDistributionChoice(self):
         choice = areaDistributionTypeChoice.get()
@@ -573,6 +585,18 @@ class Simulation:
         fig.tight_layout()
         plt.show()
     
+    def showHistogramV2(self):
+        n, bins, patches = plt.hist(x=self.npResults, bins='auto', color='#0504aa',
+                            alpha=0.7, rwidth=0.85)
+        
+        plt.grid(axis='y', alpha=0.75)
+        plt.xlabel('Np Value')
+        plt.ylabel('Frequency')
+        plt.title('Reserves')
+        maxfreq = n.max()
+        plt.ylim(ymax=np.ceil(maxfreq / 10) * 10 if maxfreq % 10 else maxfreq + 10)
+        plt.show()
+    
     def exportData(self):
         tableDictionary = {'Area': self.areaValues,
                         'Thickness': self.thicknessValues,
@@ -624,6 +648,11 @@ def getEntryValue(entry=Entry):
         return float(entry.get())
     else:
         return 0.0
+
+def openNewWindow():
+        test = Toplevel(root)
+        button = Button(test, text="Testing menu button")
+        button.pack()
 
 root = Tk()
 
