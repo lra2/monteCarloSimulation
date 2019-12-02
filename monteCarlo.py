@@ -591,7 +591,7 @@ class Simulation:
                             alpha=0.7, rwidth=0.85)
         
         plt.grid(axis='y', alpha=0.75)
-        plt.xlabel('Np Value')
+        plt.xlabel('Volume')
         plt.ylabel('Frequency')
         plt.title('Reserves')
         maxfreq = n.max()
@@ -612,6 +612,13 @@ class Simulation:
 
 def runSimulation(unitySystem, area, thickness, porosity, waterSaturation, recoveryFactor, formationVolumeFactor, simulation):
     npValues = []
+    simulation.areaValues.clear()
+    simulation.thicknessValues.clear()
+    simulation.porosityValues.clear()
+    simulation.waterSaturationValues.clear()
+    simulation.recoveryFactorValues.clear()
+    simulation.formationVolumeFactorValues.clear()
+    simulation.npValues.clear()
     for i in range(NUMBER_OF_SAMPLES):
         areaProbability = 0.0
         thicknessProbability = 0.0
